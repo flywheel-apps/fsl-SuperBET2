@@ -1,0 +1,84 @@
+#! /bin/bash
+#
+#
+CONTAINER="[fsl-SuperBET2]"
+echo -e "$CONTAINER  Initiated"
+
+# Built to flywheel-v0 spec.
+FLYWHEEL_BASE=/flywheel/v0
+
+# Configure the ENV
+chmod +x /etc/fsl/5.0/fsl.sh
+source /etc/fsl/5.0/fsl.sh
+
+OUTPUT_DIR=$FLYWHEEL_BASE/output
+#TEMPLATE_DIR=$FLYWHEEL_BASE/template
+INPUT_DIR=$FLYWHEEL_BASE/input/nifti
+MANIFEST=$FLYWHEEL_BASE/manifest.json
+CONFIG_FILE=$FLYWHEEL_BASE/config.json
+
+# Initialize config parameters
+fractional_intensity_threshold=' '
+
+# Generate flags from the manifest
+fractional_intensity_threshold_flag=$(jq -r <$MANIFEST '''.config.fractional_intensity_threshold.id')
+
+# Parse config options from CONFIG file or MANIFEST
+if [[ -f $CONFIG_FILE ]]; then
+  echo "$CONFIG_FILE found. Loading config..."
+
+  fractional_intensity_threshold="$fractional_intensity_threshold_flag $(jq -r <$CONFIG_FILE '''.config.fractional_intensity_threshold')"
+  #function_option=$(jq -r <$CONFIG_FILE '''.config.function_option')
+
+else
+  echo "$CONFIG_FILE not found. Loading defaults from $MANIFEST..."
+
+  fractional_intensity_threshold="$fractional_intensity_threshold_flag $(jq -r <$MANIFEST '''.config.fractional_intensity_threshold.default')"
+  #function_option=$(jq -r <$MANIFEST '''.config.function_option.default')
+
+fi
+
+# Compile options string
+OPTIONS="$fractional_intensity_threshold"
+echo -e "SuperBET2 options are: ${OPTIONS}"
+
+# Execute the algorithm
+input_file=$(find $INPUT_DIR/* -maxdepth 0 -type f -name "*.nii*")
+if [[ -f $input_file ]]; then
+  
+  input_file_despaced=$(echo -e "${input_file}" | tr -d '[:space:]')
+  mv "${input_file}" "${input_file_despaced}"
+  input_file=$input_file_despaced
+  
+  echo "$CONTAINER  Running Super-BET2 on `basename "$input_file"`"
+  output_file_base=$OUTPUT_DIR/$(basename "$input_file" .nii.gz)
+  output_file_base=$OUTPUT_DIR/$(basename "$output_file_base" .nii)
+  
+  #bet "$input_file" "$output_file_base"_bet -v $OPTIONS
+  standard_space_roi "$input_file" premask -b
+  #bet premask bet2_result -e -f 0.05
+  bet premask bet2_result -e $OPTIONS
+  flirt -in premask -ref /usr/share/fsl/5.0/data/standard/avg152T1_brain.nii.gz -out flirt_result -omat flirt_result.mat
+  mv bet2_result_mesh.vtk bet2_result_mesh.off
+  betsurf -1 -m -s "$input_file" bet2_result_mesh.off flirt_result.mat "$output_file_base"_superBET2
+  rm "$output_file_base"_*_mesh.off
+  
+  STATUS=$?
+
+else
+  echo "$CONTAINER  No inputs were provided and $INPUT_DIR has no valid input files!"
+  exit 1
+fi
+
+# Check exit status
+if [[ $STATUS == 0 ]]
+  then
+    echo -e "$CONTAINER  Wrote: `ls $OUTPUT_DIR`"
+    echo -e "$CONTAINER  Done!"
+
+  else
+    echo "$CONTAINER  command returned a non-zero exit code = [$STATUS]."
+    exit 1
+fi
+
+exit 0
