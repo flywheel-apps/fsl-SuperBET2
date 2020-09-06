@@ -61,7 +61,8 @@ if [[ -f $input_file ]]; then
   flirt -in premask -ref /usr/share/fsl/5.0/data/standard/avg152T1_brain.nii.gz -out flirt_result -omat flirt_result.mat
   mv bet2_result_mesh.vtk bet2_result_mesh.off
   betsurf -1 -m -s "$input_file" bet2_result_mesh.off flirt_result.mat "$output_file_base"_superBET2
-  rm "$output_file_base"_*_mesh.off
+  fslmaths "$input_file" -mul "$output_file_base"_superBET2_inskull_mask.nii.gz "$output_file_base"_deskulled.nii.gz
+  rm "$output_file_base"_*_mesh.off "$output_file_base"_superBET2_outskin_mask.nii.gz "$output_file_base"_superBET2_outskull_mask.nii.gz "$output_file_base"_superBET2_skull_mask.nii.gz
   
   STATUS=$?
 

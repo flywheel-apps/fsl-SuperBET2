@@ -1,4 +1,4 @@
-# flywheel-apps/fsl-SuperBET2
+# scitran/fsl-bet
 [![Docker Pulls](https://img.shields.io/docker/pulls/scitran/fsl-bet.svg)](https://hub.docker.com/r/scitran/fsl-bet/)
 [![Docker Stars](https://img.shields.io/docker/stars/scitran/fsl-bet.svg)](https://hub.docker.com/r/scitran/fsl-bet/)
 
