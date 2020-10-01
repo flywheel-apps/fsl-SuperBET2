@@ -30,4 +30,5 @@ COPY run ${FLYWHEEL}/run
 COPY manifest.json ${FLYWHEEL}/manifest.json
 
 # Configure entrypoint
+RUN chmod a+x /flywheel/v0/run
 ENTRYPOINT ["/flywheel/v0/run"]
