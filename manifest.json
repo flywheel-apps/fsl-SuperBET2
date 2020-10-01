@@ -7,15 +7,15 @@
   "url": "https://github.com/saslan-7/super-bet2",
   "source": "https://github.com/flywheel-apps/fsl-superbet2",
   "license": "Apache-2.0",
-  "version": "1.0.0",
+  "version": "1.0.0_5.0.7",
   "custom": {
     "flywheel": {
       "suite": "FSL"
     },
-    "docker-image": "fsl-superbet2",
+    "docker-image": "flywheel/fsl-superbet2:1.0.0_5.0.7",
     "gear-builder": {
       "category": "analysis",
-      "image": "fsl-superbet2"
+      "image": "flywheel/fsl-superbet2:1.0.0_5.0.7"
     }
   },
   "config": {
