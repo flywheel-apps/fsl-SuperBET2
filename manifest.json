@@ -6,13 +6,12 @@
   "author": "Sina Aslan, Ph.D.",
   "url": "https://github.com/saslan-7/super-bet2",
   "source": "https://github.com/flywheel-apps/fsl-superbet2",
-  "license": "Apache-2.0",
+  "license": "Other",
   "version": "1.0.0_5.0.7",
   "custom": {
     "flywheel": {
       "suite": "FSL"
     },
-    "docker-image": "flywheel/fsl-superbet2:1.0.0_5.0.7",
     "gear-builder": {
       "category": "analysis",
       "image": "flywheel/fsl-superbet2:1.0.0_5.0.7"
